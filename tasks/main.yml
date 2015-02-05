@@ -1,0 +1,4 @@
+---
+# tasks file for nginx
+- name: Install nginx web server
+  pacman: name=nginx state=present
