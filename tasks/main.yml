@@ -2,3 +2,6 @@
 # tasks file for nginx
 - name: Install nginx web server
   pacman: name=nginx state=present
+
+- name: Ensure that nginx is running
+  service: name=nginx state=started enabled=yes
