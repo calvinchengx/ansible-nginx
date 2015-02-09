@@ -1,7 +1,40 @@
 ---
-# tasks file for nginx
 - name: Install nginx web server
+  sudo: true
   pacman: name=nginx state=present
 
+- name: Enforce our nginx.conf 
+  sudo: true
+  template: src=../templates/nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+- name: Ensure sites-enabled directory is in-place
+  sudo: true
+  file: path=/etc/nginx/sites-enabled state=directory mode=777 recurse=yes
+
+- name: Ensure sites-available directory is in-place
+  sudo: true
+  file: path=/etc/nginx/sites-available state=directory mode=777 recurse=yes
+
+- name: Ensure nginx global log directory is in-place
+  sudo: true
+  file: path=/etc/nginx/logs state=directory
+
+- name: Default site conf
+  sudo: true
+  template: src=../templates/localhost.conf.j2 dest=/etc/nginx/sites-available/localhost.conf
+
+- name: Default site blank
+  sudo: true
+  file: path=/srv/http/blank state=directory mode=755 recurse=yes owner={{ sudo_user|default(deploy) }} group={{ sudo_user|default(deploy) }}
+
+- name: Default site blank html
+  sudo: true
+  file: path=/srv/http/blank/index.html state=touch mode=755
+
+- name: Enable default site
+  sudo: true
+  file: src=/etc/nginx/sites-available/localhost.conf dest=/etc/nginx/sites-enabled/localhost.conf state=link
+
 - name: Ensure that nginx is running
+  sudo: true
   service: name=nginx state=started enabled=yes
